@@ -4,7 +4,7 @@
 //    manifest, err := UnmarshalManifest(bytes)
 //    bytes, err = manifest.Marshal()
 
-package main
+package lib
 
 import "bytes"
 import "errors"

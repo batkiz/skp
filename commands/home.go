@@ -1,16 +1,14 @@
 package commands
 
 import (
-	"log"
+	. "github.com/batkiz/skp/utils"
 	"os/exec"
 )
 
-func home(app string) {
+func Home(app string) {
 	url := ""
 
 	err := exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
 
-	if err != nil {
-		log.Println(err)
-	}
+	HandleErr(err)
 }
