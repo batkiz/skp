@@ -25,12 +25,13 @@ jobs:
           format: YYYYMMDDHHmm
           utcOffset: "+08:00"
 
-      - name: Get short SHA
-        id: sha
-        run: echo "::set-output name=sha::$(git rev-parse --short HEAD)"
+      - uses: benjlevesque/short-sha@v1.1
+        id: short-sha
+        with:
+          length: 6
 
       - name: Upload artifact
         uses: actions/upload-artifact@v1
         with:
-          name: fgit-amd64-windows-${{ steps.current-time.outputs.formattedTime }}-${{ steps.sha.outputs.sha }}
+          name: fgit-amd64-windows-${{ steps.current-time.outputs.formattedTime }}-${{ steps.short-sha.outputs.sha }}
           path: ./skp.exe
