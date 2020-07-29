@@ -12,8 +12,8 @@ jobs:
 
       - name: Install latest rust toolchain
       - uses: actions/setup-go@v2
-      with:
-        go-version: '1.14'
+        with:
+          go-version: '1.14'
 
       - name: Build
         run: go build
