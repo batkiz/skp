@@ -34,5 +34,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v1
         with:
-          name: fgit-amd64-windows-${{ steps.current-time.outputs.formattedTime }}-${{ steps.short-sha.outputs.sha }}
+          name: skp-${{ steps.current-time.outputs.formattedTime }}-${{ steps.short-sha.outputs.sha }}
           path: ./skp.exe
