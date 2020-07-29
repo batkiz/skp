@@ -4,20 +4,17 @@ import (
 	"fmt"
 	"github.com/batkiz/skp/lib"
 	. "github.com/batkiz/skp/utils"
-	"io/ioutil"
 	"regexp"
 	"strings"
 )
 
+// Info is the base func for `scoop info <app>` command
 func Info(path string) {
-	json, err := ioutil.ReadFile(path)
+	name := ExtractName(path)
 
-	HandleErr(err)
+	fmt.Println("Name:", name)
 
-
-
-	app, err := lib.UnmarshalManifest(json)
-	HandleErr(err)
+	app := lib.ReadManifest(path)
 
 	fmt.Println("Homepage:", *app.Homepage)
 
@@ -38,17 +35,17 @@ func Info(path string) {
 			license = *appLicense.String
 		} else if match, err := regexp.MatchString("[|,]", *appLicense.String); match {
 			HandleErr(err)
-			lics := strings.FieldsFunc(*appLicense.String, func(r rune) bool {
+			licenses := strings.FieldsFunc(*appLicense.String, func(r rune) bool {
 				return r == '|' || r == ','
 			})
 
-			var licsUrl []string
-			for _, lic := range lics {
-				licurl := fmt.Sprintf("https://spdx.org/licenses/%v.html", lic)
-				licsUrl = append(licsUrl, licurl)
+			var licensesUrl []string
+			for _, lic := range licenses {
+				licenseUrl := fmt.Sprintf("https://spdx.org/licenses/%v.html", lic)
+				licensesUrl = append(licensesUrl, licenseUrl)
 			}
 
-			license = fmt.Sprintf("%v (%v)", *appLicense.String, strings.Join(licsUrl[:], ","))
+			license = fmt.Sprintf("%v (%v)", *appLicense.String, strings.Join(licensesUrl[:], ","))
 		} else {
 			license = fmt.Sprintf("%v (%v)",
 				*appLicense.String,
@@ -57,4 +54,37 @@ func Info(path string) {
 
 		fmt.Println("License:", license)
 	}
+
+	if app.Bin != nil {
+		fmt.Println("Binaries:")
+		if app.Bin.String != nil {
+			fmt.Printf("  %v\n", *app.Bin.String)
+		} else if len(app.Bin.UnionArray) != 0 {
+			var binaries []string
+
+			for _, union := range app.Bin.UnionArray {
+				binaries = append(binaries, *union.String)
+				for _, s := range union.StringArray {
+					binaries = append(binaries,s)
+				}
+			}
+
+			s := "  "
+			for _, binary := range binaries {
+				s += fmt.Sprintf("%v ", binary)
+			}
+			fmt.Println(s)
+		}
+	}
+
+
+}
+
+// ExtractName extracts app name from a path or url
+func ExtractName(path string) string {
+	r := regexp.MustCompile(`.*[/\\](.*?)\.json`)
+
+	name := r.FindStringSubmatch(path)
+
+	return name[1]
 }
